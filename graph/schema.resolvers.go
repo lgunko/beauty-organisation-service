@@ -5,11 +5,12 @@ package graph
 
 import (
 	"context"
-
-	model2 "github.com/lgunko/beauty-backend/EmployeeService/graph/model"
+	_ "github.com/lgunko/beauty-employee-service/client"
+	modelEmployee "github.com/lgunko/beauty-employee-service/graph/model"
 	"github.com/lgunko/beauty-organisation-service/graph/generated"
 	"github.com/lgunko/beauty-organisation-service/graph/model"
 	"github.com/lgunko/beauty-organisation-service/repository"
+	modelReuse "github.com/lgunko/beauty-reuse/graph/model"
 	"github.com/lgunko/beauty-reuse/headers"
 	"github.com/lgunko/beauty-reuse/loggingutil"
 	"github.com/lgunko/beauty-reuse/orgbasedrepository"
@@ -22,7 +23,8 @@ func (r *mutationResolver) RegisterOrg(ctx context.Context, input model.InitialO
 		return nil, err
 	}
 	email := ctx.Value(headers.Email).(string)
-	ctx, _, err = orgbasedrepository.New(output.ID, r.GetDatabase(), "Employee").Create(ctx, model2.EmployeeInput{Name: input.CreatorName, Surname: input.CreatorSurname, Email: email})
+	//employeeOutput, gqlErrors, err := client.CreateEmployee(ctx, "http://localhost:8080", modelEmployee.EmployeeInput{Name: input.CreatorName, Surname: input.CreatorSurname, Email: email, Role: modelReuse.RoleManager})
+	ctx, _, err = orgbasedrepository.New(output.ID, r.GetDatabase(), "Employee").Create(ctx, modelEmployee.EmployeeInput{Name: input.CreatorName, Surname: input.CreatorSurname, Email: email, Role: modelReuse.RoleManager})
 	if err != nil {
 		loggingutil.GetLoggerFilledFromContext(ctx).Error(err)
 		return nil, err

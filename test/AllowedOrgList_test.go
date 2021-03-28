@@ -2,13 +2,14 @@ package test
 
 import (
 	"context"
-	model2 "github.com/lgunko/beauty-backend/EmployeeService/graph/model"
-	model5 "github.com/lgunko/beauty-backend/ReusableLib/graph/model"
+	modelEmployee "github.com/lgunko/beauty-employee-service/graph/model"
 	"github.com/lgunko/beauty-organisation-service/client"
-	model4 "github.com/lgunko/beauty-organisation-service/graph/model"
+	"github.com/lgunko/beauty-organisation-service/graph/model"
 	"github.com/lgunko/beauty-organisation-service/repository"
 	"github.com/lgunko/beauty-reuse/constants"
+	modelReuse "github.com/lgunko/beauty-reuse/graph/model"
 	"github.com/lgunko/beauty-reuse/orgbasedrepository"
+	"github.com/lgunko/beauty-reuse/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,76 +20,35 @@ func (suite *OrganizationServiceTestSuite) TestAllowedOrgListWithoutHeaders() {
 }
 
 func (suite *OrganizationServiceTestSuite) TestNoRoleInOrgAllowedOrgsWithHeaders() {
-	// set up
-	ctx, _, err := orgbasedrepository.New(testingOrgID, suite.database, constants.EmployeeCollection).Create(context.Background(), model2.EmployeeInput{
-		Name:        "TestName",
-		Surname:     "TestSurname",
-		Email:       testingEmail,
-		MobilePhone: "",
-		Role:        "",
-		FavourList:  nil,
-		AvatarURL:   nil,
-	})
-
-	// call
-	allowedOrgs, gqlErrors, err := client.GetAllowedOrgList(setHeaders(ctx), "http://localhost:8080/api/query")
-
-	// assertions
-	assert.Empty(suite.T(), allowedOrgs)
-	assert.Nil(suite.T(), gqlErrors)
-	assert.Nil(suite.T(), err)
-	assert.Len(suite.T(), suite.hook.AllEntries(), 0)
+	suite.execTestAllowedOrgsWithRole("", false)
 }
 
 func (suite *OrganizationServiceTestSuite) TestMasterRoleInOrgAllowedOrgsWithHeaders() {
-	// set up
-	ctx, orgOutput, err := repository.CreateOrUpdate(context.Background(), suite.database, nil, model4.OrgInput{
-		Name:    "TestOrgName",
-		City:    "TestOrgCity",
-		Address: "TestOrgAddress",
-		LogoURL: nil,
-	})
-	ctx, _, err = orgbasedrepository.New(orgOutput.ID, suite.database, constants.EmployeeCollection).Create(context.Background(), model2.EmployeeInput{
-		Name:        "TestName",
-		Surname:     "TestSurname",
-		Email:       testingEmail,
-		MobilePhone: "",
-		Role:        model5.RoleMaster,
-		FavourList:  nil,
-		AvatarURL:   nil,
-	})
+	suite.execTestAllowedOrgsWithRole(modelReuse.RoleMaster, true)
+}
 
-	// call
-	allowedOrgs, gqlErrors, err := client.GetAllowedOrgList(setHeaders(ctx), "http://localhost:8080/api/query")
-
-	// assertions
-	assert.Len(suite.T(), allowedOrgs, 1)
-	assert.Contains(suite.T(), allowedOrgs, model4.OrgOutput{
-		ID:      orgOutput.ID,
-		Name:    "TestOrgName",
-		City:    "TestOrgCity",
-		Address: "TestOrgAddress",
-		LogoURL: nil,
-	})
-	assert.Nil(suite.T(), gqlErrors)
-	assert.Nil(suite.T(), err)
-	assert.Len(suite.T(), suite.hook.AllEntries(), 0)
+func (suite *OrganizationServiceTestSuite) TestAdministratorRoleInOrgAllowedOrgsWithHeaders() {
+	suite.execTestAllowedOrgsWithRole(modelReuse.RoleAdministrator, true)
 }
 
 func (suite *OrganizationServiceTestSuite) TestManagerRoleInOrgAllowedOrgsWithHeaders() {
+	suite.execTestAllowedOrgsWithRole(modelReuse.RoleManager, true)
+}
+
+func (suite *OrganizationServiceTestSuite) execTestAllowedOrgsWithRole(role modelReuse.Role, success bool) {
 	// set up
-	ctx, orgOutput, err := repository.CreateOrUpdate(context.Background(), suite.database, nil, model4.OrgInput{
-		Name:    "TestOrgName",
-		City:    "TestOrgCity",
-		Address: "TestOrgAddress",
+	ctx, orgOutput, err := repository.CreateOrUpdate(context.Background(), suite.database, nil, model.OrgInput{
+		Name:    test.TestingOrgName,
+		City:    test.TestingOrgCity,
+		Address: test.TestingOrgAddress,
 		LogoURL: nil,
 	})
-	ctx, _, err = orgbasedrepository.New(orgOutput.ID, suite.database, constants.EmployeeCollection).Create(context.Background(), model2.EmployeeInput{
-		Name:        "TestName",
-		Surname:     "TestSurname",
+	ctx, _, err = orgbasedrepository.New(orgOutput.ID, suite.database, constants.EmployeeCollection).Create(context.Background(), modelEmployee.EmployeeInput{
+		Name:        test.TestingEmployeeName,
+		Surname:     test.TestingEmployeeSurname,
 		Email:       testingEmail,
-		MobilePhone: "",
-		Role:        model5.RoleManager,
+		MobilePhone: test.TestingEmployeeMobilePhone,
+		Role:        role,
 		FavourList:  nil,
 		AvatarURL:   nil,
 	})
@@ -97,15 +57,22 @@ func (suite *OrganizationServiceTestSuite) TestManagerRoleInOrgAllowedOrgsWithHe
 	allowedOrgs, gqlErrors, err := client.GetAllowedOrgList(setHeaders(ctx), "http://localhost:8080/api/query")
 
 	// assertions
-	assert.Len(suite.T(), allowedOrgs, 1)
-	assert.Contains(suite.T(), allowedOrgs, model4.OrgOutput{
-		ID:      orgOutput.ID,
-		Name:    "TestOrgName",
-		City:    "TestOrgCity",
-		Address: "TestOrgAddress",
-		LogoURL: nil,
-	})
-	assert.Nil(suite.T(), gqlErrors)
-	assert.Nil(suite.T(), err)
-	assert.Len(suite.T(), suite.hook.AllEntries(), 0)
+	if success {
+		assert.Len(suite.T(), allowedOrgs, 1)
+		assert.Contains(suite.T(), allowedOrgs, model.OrgOutput{
+			ID:      orgOutput.ID,
+			Name:    test.TestingOrgName,
+			City:    test.TestingOrgCity,
+			Address: test.TestingOrgAddress,
+			LogoURL: nil,
+		})
+		assert.Nil(suite.T(), gqlErrors)
+		assert.Nil(suite.T(), err)
+		assert.Len(suite.T(), suite.hook.AllEntries(), 0)
+	} else {
+		assert.Empty(suite.T(), allowedOrgs)
+		assert.Nil(suite.T(), gqlErrors)
+		assert.Nil(suite.T(), err)
+		assert.Len(suite.T(), suite.hook.AllEntries(), 0)
+	}
 }

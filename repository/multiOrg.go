@@ -6,6 +6,7 @@ import (
 	"github.com/lgunko/beauty-organisation-service/graph/model"
 	"github.com/lgunko/beauty-reuse/constants"
 	"github.com/lgunko/beauty-reuse/errorsutil"
+	modelReuse "github.com/lgunko/beauty-reuse/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,6 +16,7 @@ import (
 const (
 	emailField    = "email"
 	orgCollection = "Org"
+	roleField     = "role"
 )
 
 type orgID struct {
@@ -37,7 +39,7 @@ func toOrgToSave(input model.IOrgInput) orgToSave {
 }
 
 func FindAllOrgs(ctx context.Context, result *[]*model.OrgOutput, db mongo.Database, email string) (context.Context, error) {
-	globalFilter := bson.M{emailField: bson.M{"$eq": email}}
+	globalFilter := bson.M{emailField: bson.M{"$eq": email}, roleField: bson.M{"$in": modelReuse.AllRole}}
 	cur, err := db.Collection("Employee").Find(ctx, globalFilter, options.Find().SetProjection(bson.M{constants.OrgIdField: 1}))
 	if err != nil {
 		return errorsutil.GetInternalServerError(ctx, err)
