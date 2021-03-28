@@ -1,0 +1,43 @@
+# Organisation Service
+#
+# https://gqlgen.com/getting-started/
+# go run github.com/99designs/gqlgen generate
+
+enum Role {
+    MANAGER
+    ADMINISTRATOR
+    MASTER
+}
+
+input InitialOrgInput {
+  creatorName: String!
+  creatorSurname: String!
+  name: String!
+  city: String!
+  address: String!
+  logoUrl: String
+}
+
+input OrgInput {
+  name: String!
+  city: String!
+  address: String!
+  logoUrl: String
+}
+
+type OrgOutput {
+  id: ID!
+  name: String!
+  city: String!
+  address: String!
+  logoUrl: String
+  role: Role!
+}
+
+type Query {
+    AllowedOrgList: [OrgOutput!]!
+}
+
+type Mutation {
+    RegisterOrg(input: InitialOrgInput!): OrgOutput!
+}
