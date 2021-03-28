@@ -13,7 +13,6 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/lgunko/beauty-organisation-service/graph/model"
-	model1 "github.com/lgunko/beauty-reuse/graph/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -55,7 +54,6 @@ type ComplexityRoot struct {
 		ID      func(childComplexity int) int
 		LogoURL func(childComplexity int) int
 		Name    func(childComplexity int) int
-		Role    func(childComplexity int) int
 	}
 
 	Query struct {
@@ -131,13 +129,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.OrgOutput.Name(childComplexity), true
-
-	case "OrgOutput.role":
-		if e.complexity.OrgOutput.Role == nil {
-			break
-		}
-
-		return e.complexity.OrgOutput.Role(childComplexity), true
 
 	case "Query.AllowedOrgList":
 		if e.complexity.Query.AllowedOrgList == nil {
@@ -216,12 +207,6 @@ var sources = []*ast.Source{
 # https://gqlgen.com/getting-started/
 # go run github.com/99designs/gqlgen generate
 
-enum Role {
-    MANAGER
-    ADMINISTRATOR
-    MASTER
-}
-
 input InitialOrgInput {
   creatorName: String!
   creatorSurname: String!
@@ -244,7 +229,6 @@ type OrgOutput {
   city: String!
   address: String!
   logoUrl: String
-  role: Role!
 }
 
 type Query {
@@ -566,41 +550,6 @@ func (ec *executionContext) _OrgOutput_logoUrl(ctx context.Context, field graphq
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _OrgOutput_role(ctx context.Context, field graphql.CollectedField, obj *model.OrgOutput) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "OrgOutput",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Role, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(model1.Role)
-	fc.Result = res
-	return ec.marshalNRole2githubᚗcomᚋlgunkoᚋbeautyᚑreuseᚋgraphᚋmodelᚐRole(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_AllowedOrgList(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1972,11 +1921,6 @@ func (ec *executionContext) _OrgOutput(ctx context.Context, sel ast.SelectionSet
 			}
 		case "logoUrl":
 			out.Values[i] = ec._OrgOutput_logoUrl(ctx, field, obj)
-		case "role":
-			out.Values[i] = ec._OrgOutput_role(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2376,16 +2320,6 @@ func (ec *executionContext) marshalNOrgOutput2ᚖgithubᚗcomᚋlgunkoᚋbeauty�
 		return graphql.Null
 	}
 	return ec._OrgOutput(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNRole2githubᚗcomᚋlgunkoᚋbeautyᚑreuseᚋgraphᚋmodelᚐRole(ctx context.Context, v interface{}) (model1.Role, error) {
-	var res model1.Role
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNRole2githubᚗcomᚋlgunkoᚋbeautyᚑreuseᚋgraphᚋmodelᚐRole(ctx context.Context, sel ast.SelectionSet, v model1.Role) graphql.Marshaler {
-	return v
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

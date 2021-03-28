@@ -8,7 +8,6 @@ import (
 	model4 "github.com/lgunko/beauty-organisation-service/graph/model"
 	"github.com/lgunko/beauty-organisation-service/repository"
 	"github.com/lgunko/beauty-reuse/constants"
-	"github.com/lgunko/beauty-reuse/graph/model"
 	"github.com/lgunko/beauty-reuse/orgbasedrepository"
 	"github.com/stretchr/testify/assert"
 )
@@ -69,7 +68,6 @@ func (suite *OrganizationServiceTestSuite) TestMasterRoleInOrgAllowedOrgsWithHea
 		Name:    "TestOrgName",
 		City:    "TestOrgCity",
 		Address: "TestOrgAddress",
-		Role:    model.RoleMaster,
 		LogoURL: nil,
 	})
 	assert.Nil(suite.T(), gqlErrors)
@@ -105,7 +103,6 @@ func (suite *OrganizationServiceTestSuite) TestManagerRoleInOrgAllowedOrgsWithHe
 		Name:    "TestOrgName",
 		City:    "TestOrgCity",
 		Address: "TestOrgAddress",
-		Role:    model.RoleManager,
 		LogoURL: nil,
 	})
 	assert.Nil(suite.T(), gqlErrors)

@@ -16,8 +16,7 @@ func GetAllowedOrgList(ctx context.Context, orgServiceURI string) ([]model.OrgOu
     			name,
     			city,
     			address,
-    			logoUrl,
-				role
+    			logoUrl
   			}
 		}
 	`
@@ -38,8 +37,7 @@ func RegisterOrg(ctx context.Context, orgServiceURI string, initialOrgInput mode
     			name,
     			city,
     			address,
-    			logoUrl,
-				role
+    			logoUrl
   			}
 		}
 	`

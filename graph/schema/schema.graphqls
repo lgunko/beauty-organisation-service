@@ -3,12 +3,6 @@
 # https://gqlgen.com/getting-started/
 # go run github.com/99designs/gqlgen generate
 
-enum Role {
-    MANAGER
-    ADMINISTRATOR
-    MASTER
-}
-
 input InitialOrgInput {
   creatorName: String!
   creatorSurname: String!
@@ -31,7 +25,6 @@ type OrgOutput {
   city: String!
   address: String!
   logoUrl: String
-  role: Role!
 }
 
 type Query {

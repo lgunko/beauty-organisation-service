@@ -1,7 +1,5 @@
 package model
 
-import "github.com/lgunko/beauty-reuse/graph/model"
-
 type IOrgInput interface {
 	ToOutput(id string) OrgOutput
 	GetOrgInput() OrgInput
@@ -21,12 +19,11 @@ type InitialOrgInput struct {
 }
 
 type OrgOutput struct {
-	ID      string     `json:"id" bson:"_id"`
-	Name    string     `json:"name"`
-	City    string     `json:"city"`
-	Address string     `json:"address"`
-	LogoURL *string    `json:"logoUrl"`
-	Role    model.Role `json:"role"`
+	ID      string  `json:"id" bson:"_id"`
+	Name    string  `json:"name"`
+	City    string  `json:"city"`
+	Address string  `json:"address"`
+	LogoURL *string `json:"logoUrl"`
 }
 
 func (input OrgInput) GetOrgInput() OrgInput {

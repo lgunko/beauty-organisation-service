@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/lgunko/beauty-organisation-service/client"
 	"github.com/lgunko/beauty-organisation-service/graph/model"
-	model1 "github.com/lgunko/beauty-reuse/graph/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -46,7 +45,6 @@ func (suite *OrganizationServiceTestSuite) TestRegisterOrgWithHeaders() {
 		City:    "TestOrgCity",
 		Address: "TestOrgAddress",
 		LogoURL: nil,
-		Role:	 model1.RoleManager,
 	}, *org)
 	assert.Nil(suite.T(), gqlErrors)
 	assert.Nil(suite.T(), err)

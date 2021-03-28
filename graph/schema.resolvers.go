@@ -10,7 +10,6 @@ import (
 	"github.com/lgunko/beauty-organisation-service/graph/generated"
 	"github.com/lgunko/beauty-organisation-service/graph/model"
 	"github.com/lgunko/beauty-organisation-service/repository"
-	model1 "github.com/lgunko/beauty-reuse/graph/model"
 	"github.com/lgunko/beauty-reuse/headers"
 	"github.com/lgunko/beauty-reuse/loggingutil"
 	"github.com/lgunko/beauty-reuse/orgbasedrepository"
@@ -28,7 +27,6 @@ func (r *mutationResolver) RegisterOrg(ctx context.Context, input model.InitialO
 		loggingutil.GetLoggerFilledFromContext(ctx).Error(err)
 		return nil, err
 	}
-	output.Role = model1.RoleManager
 
 	return output, nil
 }
@@ -41,15 +39,6 @@ func (r *queryResolver) AllowedOrgList(ctx context.Context) ([]*model.OrgOutput,
 		loggingutil.GetLoggerFilledFromContext(ctx).Error(err)
 		return nil, err
 	}
-	for _, org := range result {
-		ctx, role, err := repository.GetUsersRole(ctx, r.GetDatabase(), org.ID, email)
-		if err != nil {
-			loggingutil.GetLoggerFilledFromContext(ctx).Error(err)
-			return nil, err
-		}
-		org.Role = *role
-	}
-
 	return result, nil
 }
 
